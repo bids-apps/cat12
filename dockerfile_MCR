@@ -1,0 +1,61 @@
+FROM debian:bookworm-slim
+
+LABEL org.opencontainers.image.authors="fil.spm@ucl.ac.uk, Malgorzata Wierzba (m.wierzba@fz-juelich.de), Felix Hoffstaedter (f.hoffstaedter@fz-juelich.de)"
+LABEL org.opencontainers.image.source="https://gin.g-node.org/felixh/cat12-container"
+LABEL org.opencontainers.image.version="v1.1"
+
+ARG DEBIAN_FRONTEND="noninteractive"
+
+ENV CATversion="r2042"
+ENV STANDALONE="/code/SPM/MCR_Linux/standalone"
+ENV SPMROOT="/code/SPM/MCR_Linux"
+ENV MCRROOT="/usr/local/MATLAB/MATLAB_Runtime/v93"
+ENV MCR_INHIBIT_CTF_LOCK="1"
+
+
+RUN apt-get update -qq && \
+    apt-get -qq -y --no-install-recommends install \
+    build-essential \
+    ca-certificates \
+    curl \
+    unzip \
+    liboctave-dev \
+    libxext6 \
+    libxt6 \
+    moreutils \
+    wget \
+ && apt-get clean \
+ && rm -rf \
+     /tmp/hsperfdata* \
+     /var/*/apt/*/partial \
+     /var/lib/apt/lists/* \
+     /var/log/apt/term*
+
+#  install MCR
+RUN mkdir /downloads/MCR \
+    && curl -fsSL --retry 5 https://ssd.mathworks.com/supportfiles/downloads/R2017b/deployment_files/R2017b/installers/glnxa64/MCR_R2017b_glnxa64_installer.zip | tar -xzC /downloads/MCR MCR_R2017b_glnxa64_installer.zip --strip-components 1 \
+    && bash /downloads/MCR/install -mode silent -agreeToLicense yes
+
+# transfer code and set permission
+RUN mkdir -p /code
+COPY ./code /code
+RUN ls /code && find /code -type f -print0 | xargs -0 chmod +r
+
+# install CAT12
+RUN mkdir -p /batch \
+    && mkdir -p /downloads \
+    && cd /downloads \
+    && wget http://www.neuro.uni-jena.de/cat12/CAT12.8.1_${CATversion}_R2017b_MCR_Linux.zip && unzip -d //code/SPM CAT12.8.1_${CATversion}_R2017b_MCR_Linux.zip \
+    && rm -fr /downloads \
+    && /code/SPM/MCR_Linux/run_spm12.sh /usr/local/MATLAB/MATLAB_Runtime/v93 quit \
+    && cd /code/SPM/MCR_Linux \
+    && chmod +rx run_spm12.sh spm12.sh spm12 spm12.ctf
+    && cd ${STANDALONE} && chmod +rx *.sh \
+    && cd /code && ln -s ${STANDALONE}/*.sh . \
+    && cd /batch && ln -s ${STANDALONE}/*.m .
+
+    
+# clean
+RUN rm -f /downloads
+
+ENTRYPOINT ['/code/main "$@"']
