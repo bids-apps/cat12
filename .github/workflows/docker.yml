@@ -13,10 +13,6 @@ concurrency:
 jobs:
 
     build:
-        strategy:
-            matrix:
-                image: [Dockerfile_1]
-            fail-fast: false
         runs-on: ubuntu-latest
         steps:
         -   uses: actions/checkout@v4
@@ -26,7 +22,7 @@ jobs:
             run: make tests/data/MoAEpilot
         -   name: Build the Docker image
             run: |
-                docker build . --file ${{ matrix.image }} --tag cat12
+                docker build . --tag cat12
                 docker images
         -   name: help
             run: docker run --rm cat12 view cat_standalone_segment.m
