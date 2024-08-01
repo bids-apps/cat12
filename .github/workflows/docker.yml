@@ -23,5 +23,5 @@ jobs:
                 fetch-depth: 0
         -   name: Build the Docker image
             run: |
-                docker build . --file Dockerfile --tag cat12
+                docker build . --file ${{ matrix.image }} --tag cat12
                 docker images
