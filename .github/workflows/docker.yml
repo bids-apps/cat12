@@ -1,1 +1,34 @@
-/annex/objects/MD5E-s908--d79893dc28bfcb54aa92dd21c567641a.yml
+---
+name: docker build
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+
+    build:
+        strategy:
+            matrix:
+                image: [Dockerfile_1]
+            fail-fast: false
+        runs-on: ubuntu-latest
+        steps:
+        -   uses: actions/checkout@v4
+            with:
+                fetch-depth: 0
+        -   name: get test data
+            run: make tests/data/MoAEpilot
+        -   name: Build the Docker image
+            run: |
+                docker build . --file ${{ matrix.image }} --tag cat12
+                docker images
+        -   name: help
+            run: docker run --rm -it cat12_mcr
+        -   name: test
+            run: docker run -v ${PWD}/tests/data/MoAEpilot:/data --rm -it cat12_mcr /data/sub-01/anat/sub-01_T1w.nii -b cat_standalone_segment.m
