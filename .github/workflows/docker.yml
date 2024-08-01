@@ -1,0 +1,27 @@
+---
+name: docker build
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+
+    build:
+        strategy:
+            matrix:
+                image: [dockerfile_MCR, Dockerfile]
+        runs-on: ubuntu-latest
+        steps:
+        -   uses: actions/checkout@v4
+            with:
+                fetch-depth: 0
+        -   name: Build the Docker image
+            run: |
+                docker build . --file Dockerfile --tag cat12
+                docker images

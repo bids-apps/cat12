@@ -1,7 +1,3 @@
-# Project <insert name>
+# CAT-12 container
 
-## Dataset structure
-
-- All inputs (i.e. building blocks from other sources) are located in
-  `inputs/`.
-- All custom code is located in `code/`.
+Docker and Apptainer image for [CAT12](https://neuro-jena.github.io/cat/).

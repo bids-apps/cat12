@@ -1,0 +1,37 @@
+---
+ci:
+    skip: [hadolint-docker]
+
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+    -   id: check-yaml
+    -   id: check-json
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-case-conflict
+    -   id: check-merge-conflict
+    -   id: mixed-line-ending
+
+-   repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+    rev: 0.2.3
+    hooks:
+    -   id: yamlfmt
+        args: [--mapping, '4', --sequence, '4', --offset, '0']
+
+
+-   repo: https://github.com/hadolint/hadolint
+    rev: v2.13.0-beta
+    hooks:
+    -   id: hadolint-docker
+        name: Lint Dockerfiles
+        description: Runs hadolint Docker image to lint Dockerfiles
+        language: docker_image
+        types: [dockerfile]
+        entry: ghcr.io/hadolint/hadolint hadolint
+
+-   repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+    -   id: codespell
