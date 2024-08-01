@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM debian:bookworm-slim@sha256:5f7d5664eae4a192c2d2d6cb67fc3f3c7891a8722cd2903cc35aa649a12b0c8d
 
 LABEL org.opencontainers.image.authors="fil.spm@ucl.ac.uk, Malgorzata Wierzba (m.wierzba@fz-juelich.de), Felix Hoffstaedter (f.hoffstaedter@fz-juelich.de)"
 LABEL org.opencontainers.image.source="https://gin.g-node.org/felixh/cat12-container"
@@ -11,22 +11,22 @@ ENV STANDALONE="/opt/spm12/toolbox/cat12/standalone"
 
 RUN apt-get update -qq && \
     apt-get -qq -y --no-install-recommends install \
-    build-essential \
-    ca-certificates \
-    curl \
-    unzip \
-    liboctave-dev \
-    libxext6 \
-    libxt6 \
-    moreutils \
-    octave \
-    wget \
- && apt-get clean \
- && rm -rf \
-     /tmp/hsperfdata* \
-     /var/*/apt/*/partial \
-     /var/lib/apt/lists/* \
-     /var/log/apt/term*
+        build-essential \
+        ca-certificates \
+        curl \
+        unzip \
+        liboctave-dev \
+        libxext6 \
+        libxt6 \
+        moreutils \
+        octave \
+        wget \
+    && apt-get clean \
+    && rm -rf \
+        /tmp/hsperfdata* \
+        /var/*/apt/*/partial \
+        /var/lib/apt/lists/* \
+        /var/log/apt/term*
 
 #  install SPM12
 RUN mkdir /opt/spm12 \

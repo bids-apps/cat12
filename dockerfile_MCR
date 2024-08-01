@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM debian:bookworm-slim@sha256:5f7d5664eae4a192c2d2d6cb67fc3f3c7891a8722cd2903cc35aa649a12b0c8d
 
 LABEL org.opencontainers.image.authors="fil.spm@ucl.ac.uk, Malgorzata Wierzba (m.wierzba@fz-juelich.de), Felix Hoffstaedter (f.hoffstaedter@fz-juelich.de)"
 LABEL org.opencontainers.image.source="https://gin.g-node.org/felixh/cat12-container"
@@ -15,24 +15,24 @@ ENV MCR_INHIBIT_CTF_LOCK="1"
 
 RUN apt-get update -qq && \
     apt-get -qq -y --no-install-recommends install \
-    build-essential \
-    ca-certificates \
-    curl \
-    unzip \
-    liboctave-dev \
-    libxext6 \
-    libxt6 \
-    moreutils \
-    wget \
- && apt-get clean \
- && rm -rf \
-     /tmp/hsperfdata* \
-     /var/*/apt/*/partial \
-     /var/lib/apt/lists/* \
-     /var/log/apt/term*
+        build-essential \
+        ca-certificates \
+        curl \
+        unzip \
+        liboctave-dev \
+        libxext6 \
+        libxt6 \
+        moreutils \
+        wget \
+    && apt-get clean \
+    && rm -rf \
+        /tmp/hsperfdata* \
+        /var/*/apt/*/partial \
+        /var/lib/apt/lists/* \
+        /var/log/apt/term*
 
 #  install MCR
-RUN mkdir /downloads/MCR \
+RUN mkdir -p /downloads/MCR \
     && curl -fsSL --retry 5 https://ssd.mathworks.com/supportfiles/downloads/R2017b/deployment_files/R2017b/installers/glnxa64/MCR_R2017b_glnxa64_installer.zip | tar -xzC /downloads/MCR MCR_R2017b_glnxa64_installer.zip --strip-components 1 \
     && bash /downloads/MCR/install -mode silent -agreeToLicense yes
 
@@ -49,7 +49,7 @@ RUN mkdir -p /batch \
     && rm -fr /downloads \
     && /code/SPM/MCR_Linux/run_spm12.sh /usr/local/MATLAB/MATLAB_Runtime/v93 quit \
     && cd /code/SPM/MCR_Linux \
-    && chmod +rx run_spm12.sh spm12.sh spm12 spm12.ctf
+    && chmod +rx run_spm12.sh spm12.sh spm12 spm12.ctf \
     && cd ${STANDALONE} && chmod +rx *.sh \
     && cd /code && ln -s ${STANDALONE}/*.sh . \
     && cd /batch && ln -s ${STANDALONE}/*.m .
