@@ -16,6 +16,7 @@ jobs:
         strategy:
             matrix:
                 image: [dockerfile_MCR, Dockerfile]
+            fail-fast: false
         runs-on: ubuntu-latest
         steps:
         -   uses: actions/checkout@v4
