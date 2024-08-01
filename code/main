@@ -22,7 +22,7 @@ then
 	exit 0
     elif [ -f ${STANDALONE}/"$2" ]
     then
-	echo "Copying batch file to:"    
+	echo "Copying batch file to:"
 	cp -vi ${STANDALONE}/"$2" "$3"
 	exit 0
     else

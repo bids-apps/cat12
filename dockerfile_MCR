@@ -54,7 +54,7 @@ RUN mkdir -p /batch \
     && cd /code && ln -s ${STANDALONE}/*.sh . \
     && cd /batch && ln -s ${STANDALONE}/*.m .
 
-    
+
 # clean
 RUN rm -f /downloads
 
