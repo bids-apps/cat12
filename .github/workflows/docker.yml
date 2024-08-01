@@ -29,6 +29,6 @@ jobs:
                 docker build . --file ${{ matrix.image }} --tag cat12
                 docker images
         -   name: help
-            run: docker run --rm -it cat12_mcr
+            run: docker run --rm cat12
         -   name: test
-            run: docker run -v ${PWD}/tests/data/MoAEpilot:/data --rm -it cat12_mcr /data/sub-01/anat/sub-01_T1w.nii -b cat_standalone_segment.m
+            run: docker run -v ${PWD}/tests/data/MoAEpilot:/data --rm cat12 /data/sub-01/anat/sub-01_T1w.nii -b cat_standalone_segment.m

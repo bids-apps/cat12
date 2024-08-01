@@ -1,4 +1,3 @@
 .simg
 
-tests/data/raw
-tests/data/MoAEpilot
+tests/data
