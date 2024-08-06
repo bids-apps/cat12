@@ -37,6 +37,8 @@ RUN export ND_ENTRYPOINT="/neurodocker/startup.sh" \
            libxt6 \
            locales \
            openjdk-8-jre \
+           python3 \
+           pip \
            unzip \
     && rm -rf /var/lib/apt/lists/* \
     && sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
@@ -67,6 +69,8 @@ RUN mkdir -p /code
 COPY ./code /code
 RUN ls /code && find /code -type f -print0 | xargs -0 chmod +r
 
+RUN pip install -r /code/requirements.txt
+
 WORKDIR ${STANDALONE}
 
-ENTRYPOINT ["/code/main"]
+ENTRYPOINT ["python3", "/code/main.py"]
