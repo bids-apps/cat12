@@ -137,6 +137,8 @@ def main():
                     logger.info(cmd)
 
                     subprocess.run(
+                        cmd.split(), stdout=log, stderr=subprocess.STDOUT
+                    )
                         cmd, stdout=log, stderr=subprocess.STDOUT, shell=True
                     )
 
@@ -159,12 +161,12 @@ def copy_files(layout_in, output_dir, subjects):
         for subject_label in subjects:
             logger.info(f"Copying {subject_label}")
 
-            this_filter = {}
-            this_filter["datatype"] = "anat"
-            this_filter["suffix"] = "T1w"
-            this_filter["extension"] = "nii.*"
-            this_filter["subject"] = subject_label
-
+            this_filter = {
+                "datatype": "anat",
+                "suffix": "T1w",
+                "extension": "nii.*",
+                "subject": subject_label,
+            }
             bf = layout_in.get(
                 **this_filter,
                 regex_search=True,
