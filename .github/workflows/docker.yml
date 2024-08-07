@@ -30,7 +30,7 @@ jobs:
                 make build
                 docker images
         -   name: help
-            run: docker run --rm cat12 --ghelp
+            run: docker run --rm cat12 --help
         -   name: quick test
             run: |
                 make view

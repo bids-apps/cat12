@@ -40,7 +40,7 @@ def get_dataset_layout(
     if not use_database:
         return BIDSLayout(
             dataset_path,
-            validate=False,
+            validate=True,
             derivatives=False,
         )
 

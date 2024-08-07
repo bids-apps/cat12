@@ -139,8 +139,6 @@ def main():
                     subprocess.run(
                         cmd.split(), stdout=log, stderr=subprocess.STDOUT
                     )
-                        cmd, stdout=log, stderr=subprocess.STDOUT, shell=True
-                    )
 
                 progress.update(subject_loop, advance=1)
 
