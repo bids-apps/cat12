@@ -129,16 +129,15 @@ def main():
                 log_file.parent.mkdir(parents=True, exist_ok=True)
 
                 with log_file.open("w") as log:
-                    cmd = (
-                        str(STANDALONE / "cat_standalone.sh ")
-                        + file.path
-                        + f" -b cat_standalone_{command}.m"
-                    )
+                    cmd = [
+                        str(STANDALONE / "cat_standalone.sh"),
+                        file.path,
+                        "-b",
+                        f"cat_standalone_{command}.m",
+                    ]
                     logger.info(cmd)
 
-                    subprocess.run(
-                        cmd.split(), stdout=log, stderr=subprocess.STDOUT
-                    )
+                    subprocess.run(cmd, stdout=log, stderr=subprocess.STDOUT)
 
                 progress.update(subject_loop, advance=1)
 
