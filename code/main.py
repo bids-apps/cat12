@@ -10,7 +10,6 @@ from pathlib import Path
 
 import nibabel as nb
 from _parsers import common_parser
-from _version import __version__
 from bids_utils import (
     get_dataset_layout,
     init_derivatives_layout,
@@ -83,7 +82,7 @@ def main():
 
     layout_in = get_dataset_layout(bids_dir)
 
-    output_dir = output_dir / f"CAT12_{__version__}"
+    output_dir = output_dir / "CAT12"
 
     subjects = args.participant_label or layout_in.get_subjects()
     subjects = list_subjects(layout_in, subjects)
