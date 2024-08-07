@@ -33,7 +33,7 @@ jobs:
             run: docker run --rm cat12 --help
         -   name: quick test
             run: |
-                make view
-                make copy
+                docker run --rm cat12 . . participant view tfce
+                docker run --rm cat12 . /foo participant copy tfce
         -   name: segment
             run: make ds000001

@@ -24,7 +24,7 @@ data_ds000001:
 
 ds000001: data_ds000001
 	mkdir -p tests/data/outputs
-	docker run --rm -it \
+	docker run --rm \
 		-v $${PWD}/tests/data:/data \
 		cat12 /data/ds000001 /data/outputs/ds000001 participant segment --participant_label 01 02 03
 
