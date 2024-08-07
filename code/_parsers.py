@@ -64,16 +64,6 @@ Multiple participants can be specified with a space separated list.
         nargs="+",
     )
     parser.add_argument(
-        "--run",
-        help="""
-The label of the run that will be analyzed.
-
-The label corresponds to run-<task_label> from the BIDS spec
-so it does not include "run-").
-        """,
-        nargs="+",
-    )
-    parser.add_argument(
         "-v",
         "--verbose",
         dest="log_level",
