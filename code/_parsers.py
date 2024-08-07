@@ -83,7 +83,7 @@ For further details, please check out TBD.
 def _add_target(parser, with_all=False):
     choices = supported_batches()
     if with_all:
-        choices.extend("all")
+        choices.append("all")
     parser.add_argument(
         "target",
         help="Batch name",
