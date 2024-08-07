@@ -38,9 +38,6 @@ def main():
 
     args = parser.parse_args(argv[1:])
 
-    log_level_name = log_levels()[int(args.verbose[0])]
-    logger.setLevel(log_level_name)
-
     output_dir = Path(args.output_dir[0])
 
     command = args.command
@@ -72,6 +69,9 @@ def main():
             print(f"[green]{file.read()}")
 
         sys.exit(EXIT_CODES["SUCCESS"]["Value"])
+
+    log_level_name = log_levels()[int(args.verbose[0])]
+    logger.setLevel(log_level_name)
 
     bids_dir = Path(args.bids_dir[0])
     if not bids_dir.exists():
