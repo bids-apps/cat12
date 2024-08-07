@@ -8,8 +8,10 @@ build:
 	docker build . --tag cat12
 
 view:
-	docker run --rm -it  -v $${PWD}/tests/data/MoAEpilot:/data --rm cat12 . . group view tfce
-
+	docker run --rm -it  -v $${PWD}/tests/data/MoAEpilot:/data --rm cat12 . . participant view tfce
 
 copy:
-	docker run --rm -it  -v $${PWD}/tests/data/MoAEpilot:/data --rm cat12 . . group copy tfce /foo
+	docker run --rm -it  -v $${PWD}/tests/data/MoAEpilot:/data --rm cat12 . /foo participant copy tfce
+
+segment:
+	docker run --rm -it  -v $${PWD}/tests/data/MoAEpilot:/data --rm cat12 /data /data/derivatives participant segment

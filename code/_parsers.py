@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from argparse import ArgumentParser, HelpFormatter
 
+from _version import __version__
 from defaults import supported_batches
-
-__version__ = "0.1.0"
 
 
 def _base_parser(
@@ -91,7 +90,10 @@ For further details, please check out TBD.
     return parser
 
 
-def _add_target(parser):
+def _add_target(parser, with_all=False):
+    choices = supported_batches()
+    if with_all:
+        choices.extend("all")
     parser.add_argument(
         "target",
         help="Batch name",
@@ -122,16 +124,17 @@ def common_parser(
 
     copy_parser = subparsers.add_parser(
         "copy",
-        help="Copy batch.",
+        help="Copy batch to output_dir.",
         formatter_class=parser.formatter_class,
     )
-    copy_parser = _add_target(copy_parser)
-    copy_parser.add_argument(
-        "destination",
-        help="Path to copy to.",
-        type=str,
-        nargs=1,
+    copy_parser = _add_target(copy_parser, with_all=True)
+
+    segment_parser = subparsers.add_parser(
+        "segment",
+        help="segment",
+        formatter_class=parser.formatter_class,
     )
+    segment_parser = _add_common_arguments(segment_parser)
 
     return parser
 

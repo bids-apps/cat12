@@ -1,2 +1,3 @@
 rich_argparse
 pybids
+nibabel

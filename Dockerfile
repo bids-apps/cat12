@@ -66,10 +66,11 @@ RUN echo "Downloading standalone CAT12 ..." \
 
 # transfer code and set permission
 RUN mkdir -p /code
+COPY ./code/requirements.txt /code
+RUN pip install -r /code/requirements.txt
+
 COPY ./code /code
 RUN ls /code && find /code -type f -print0 | xargs -0 chmod +r
-
-RUN pip install -r /code/requirements.txt
 
 WORKDIR ${STANDALONE}
 
