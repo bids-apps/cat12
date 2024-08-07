@@ -38,5 +38,5 @@ repos:
     rev: 7.1.1
     hooks:
     -   id: flake8
-        args: [--verbose]
+        args: [--config, .flake8, --verbose]
         additional_dependencies: [flake8-docstrings, flake8-use-fstring, flake8-functions, flake8-bugbear]

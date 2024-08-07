@@ -54,7 +54,7 @@ def get_dataset_layout(
     )
 
 
-def init_derivatives_layout(output_dir) -> BIDSLayout:
+def init_derivatives_layout(output_dir: Path) -> BIDSLayout:
     """Initialize a derivatives dataset and returns its layout.
 
     :param output_dir:
@@ -64,11 +64,8 @@ def init_derivatives_layout(output_dir) -> BIDSLayout:
     :rtype: BIDSLayout
     """
     create_dir_if_absent(output_dir)
+    write_dataset_description(output_dir)
     layout_out = get_dataset_layout(output_dir)
-    layout_out = set_dataset_description(layout_out)
-    layout_out.dataset_description["DatasetType"] = "derivative"
-    layout_out.dataset_description["GeneratedBy"][0]["Name"] = "CAT12"
-    write_dataset_description(layout_out)
     return layout_out
 
 
@@ -96,64 +93,37 @@ def list_subjects(layout: BIDSLayout, subjects) -> list[str]:
     return subjects
 
 
-def set_dataset_description(
-    layout: BIDSLayout, is_derivative: bool = True
-) -> BIDSLayout:
+def write_dataset_description(output_dir) -> None:
     """Add dataset description to a layout.
 
-    :param layout: _description_
-    :type layout: BIDSLayout
-
-    :param is_derivative: Defaults to True
-    :type is_derivative: bool, optional
-
-    :return: Updated BIDSLayout of the dataset
-    :rtype: BIDSLayout
+    :param output_dir: output_dir
+    :type output_dir: Path
     """
     data: dict[str, Any] = {
         "Name": "dataset name",
         "BIDSVersion": "1.9.0",
-        "DatasetType": "raw",
-        "License": "CCO",
-        "Authors": ["", ""],
-        "Acknowledgements": "Special thanks to: ",
-        "HowToAcknowledge": """Please cite this paper: """,
-        "Funding": ["", ""],
-        "ReferencesAndLinks": [],
-        "DatasetDOI": "doi:",
+        "DatasetType": "derivative",
+        "License": "???",
+        "ReferencesAndLinks": ["https://doi.org/10.1101/2022.06.11.495736"],
     }
+    data["GeneratedBy"] = [
+        {
+            "Name": "cat12",
+            "Version": __version__,
+            "Container": {"Type": "", "Tag": __version__},
+            "Description": "",
+            "CodeURL": "",
+        },
+    ]
+    data["SourceDatasets"] = [
+        {
+            "DOI": "doi:",
+            "URL": "",
+            "Version": "",
+        }
+    ]
 
-    if is_derivative:
-        data["GeneratedBy"] = [
-            {
-                "Name": "bidsMReye",
-                "Version": __version__,
-                "Container": {"Type": "", "Tag": ""},
-                "Description": "",
-                "CodeURL": "",
-            },
-        ]
-
-        data["SourceDatasets"] = [
-            {
-                "DOI": "doi:",
-                "URL": "",
-                "Version": "",
-            }
-        ]
-
-    layout.dataset_description = data
-
-    return layout
-
-
-def write_dataset_description(layout: BIDSLayout) -> None:
-    """Add a dataset_description.json to a BIDS dataset.
-
-    :param layout: BIDSLayout of the dataset to update.
-    :type layout: BIDSLayout
-    """
-    output_file = Path(layout.root) / "dataset_description.json"
+    output_file = output_dir / "dataset_description.json"
 
     with open(output_file, "w") as ff:
-        json.dump(layout.dataset_description, ff, indent=4)
+        json.dump(data, ff, indent=4)

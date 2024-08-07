@@ -62,13 +62,17 @@ If this parameter is not provided, all subjects will be analyzed.
 Multiple participants can be specified with a space separated list.
         """,
         nargs="+",
+        required=False,
     )
     parser.add_argument(
-        "-v",
         "--verbose",
-        dest="log_level",
-        action="append_const",
-        const=-1,
+        help="""
+        Verbosity level.
+        """,
+        choices=[0, 1, 2, 3],
+        default=2,
+        type=int,
+        nargs=1,
     )
     parser.add_argument(
         "--bids_filter_file",
@@ -76,6 +80,7 @@ Multiple participants can be specified with a space separated list.
 A JSON file describing custom BIDS input filters using PyBIDS.
 For further details, please check out TBD.
         """,
+        required=False,
     )
     return parser
 
@@ -105,6 +110,12 @@ def common_parser(
         required=True,
     )
 
+    subparsers.add_parser(
+        "help",
+        help="Show cat12 script help.",
+        formatter_class=parser.formatter_class,
+    )
+
     view_parser = subparsers.add_parser(
         "view",
         help="View batch.",
@@ -125,20 +136,27 @@ def common_parser(
         formatter_class=parser.formatter_class,
     )
     segment_parser = _add_common_arguments(segment_parser)
+    segment_parser.add_argument(
+        "--reset_database",
+        help="Resets the database of the input dataset.",
+        action="store_true",
+        required=False,
+    )
+    segment_parser.add_argument(
+        "--type",
+        help="""Type of segmentation.
+ default: default CAT12 preprocessing batch;
+ default: simple processing batch;
+ 0 - longitudinal developmental;
+ 1 - longitudinal plasticity/learning;
+ 2 - longitudinal aging;
+ 3 - longitudinal save models 1 and 2;
+""",
+        choices=["default", "simple", "0", "1", "2", "3"],
+        default="default",
+        required=False,
+        type=str,
+        nargs=1,
+    )
 
     return parser
-
-
-# cat_standalone_segment_enigma.m
-# cat_standalone_segment_long.m
-# cat_standalone_resample.m
-# cat_standalone_simple.m
-# cat_standalone_tfce.m
-# cat_standalone_get_IQR.m
-# cat_standalone_smooth.m
-# cat_standalone_dicom2nii.m
-# cat_standalone_deface.m
-# cat_standalone_get_TIV.m
-# cat_standalone_segment.m
-# cat_standalone_get_quality.m
-# cat_standalone_get_ROI_values.m

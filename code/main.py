@@ -17,15 +17,10 @@ from bids_utils import (
     list_subjects,
 )
 from cat_logging import cat12_log
-from defaults import default_log_level
+from defaults import log_levels
 from rich import print
 from rich_argparse import RichHelpFormatter
 from utils import progress_bar
-
-logger = cat12_log(name="cat12")
-
-log_level_name = default_log_level()
-logger.setLevel(log_level_name)
 
 argv = sys.argv
 
@@ -35,13 +30,7 @@ with open(Path(__file__).parent / "exit_codes.json") as f:
 # Get environment variable
 STANDALONE = Path(os.getenv("STANDALONE"))
 
-
-def print_error_and_exit(message):
-    """Log error and exit."""
-    logger.error(message)
-    #  print help
-    subprocess.run([STANDALONE / "cat_standalone.sh"])
-    sys.exit(EXIT_CODES["FAILURE"]["Value"])
+logger = cat12_log(name="cat12")
 
 
 def main():
@@ -50,11 +39,18 @@ def main():
 
     args = parser.parse_args(argv[1:])
 
+    log_level_name = log_levels()[int(args.verbose[0])]
+    logger.setLevel(log_level_name)
+
     output_dir = Path(args.output_dir[0])
 
     command = args.command
 
-    if command == "copy":
+    if command == "help":
+        subprocess.run([STANDALONE / "cat_standalone.sh"])
+        sys.exit(EXIT_CODES["SUCCESS"]["Value"])
+
+    elif command == "copy":
         target = args.target[0]
 
         output_dir.mkdir(exist_ok=True, parents=True)
@@ -101,43 +97,77 @@ def main():
 
     layout_out = init_derivatives_layout(output_dir)
 
-    text = "processing subjects"
-    with progress_bar(text=text) as progress:
-        subject_loop = progress.add_task(
-            description="processing subjects", total=len(subjects)
-        )
-        for subject_label in subjects:
-            this_filter = {}
-            this_filter["datatype"] = "anat"
-            this_filter["suffix"] = "T1w"
-            this_filter["extension"] = "nii"
-            this_filter["subject"] = subject_label
+    if command == "segment":
 
-            bf = layout_out.get(
-                **this_filter,
+        batch = "cat_standalone_segment.m"
+        segment_type = args.type[0]
+        if segment_type == "simple":
+            batch = "cat_standalone_simple.m"
+        elif segment_type in ["0", "1", "2", "3"]:
+            batch = "cat_standalone_segment_long.m"
+
+        text = "processing subjects"
+        with progress_bar(text=text) as progress:
+
+            subject_loop = progress.add_task(
+                description="processing subjects", total=len(subjects)
             )
 
-            for file in bf:
+            for subject_label in subjects:
 
-                now = datetime.now().strftime("%s")
+                this_filter = {
+                    "datatype": "anat",
+                    "suffix": "T1w",
+                    "extension": "nii",
+                    "subject": subject_label,
+                }
+
+                bf = layout_out.get(
+                    **this_filter,
+                )
+
+                if len(bf) < 1:
+                    logger.warning(
+                        f"No data found for subject {subject_label}."
+                    )
+                    continue
+                if segment_type in ["0", "1", "2", "3"] and len(bf) < 2:
+                    logger.warning(
+                        (
+                            "Longitudinal segmentation requested "
+                            f"but subject {subject_label} only has 1 image."
+                        )
+                    )
+                    continue
+
+                now = datetime.now().replace(microsecond=0).isoformat()
                 log_file = (
                     output_dir
                     / f"sub-{subject_label}"
                     / "log"
-                    / (now + "_" + Path(file.path).stem + ".log")
+                    / f"{now}_sub-{subject_label}.log"
                 )
                 log_file.parent.mkdir(parents=True, exist_ok=True)
 
-                with log_file.open("w") as log:
-                    cmd = [
-                        str(STANDALONE / "cat_standalone.sh"),
-                        file.path,
-                        "-b",
-                        f"cat_standalone_{command}.m",
-                    ]
-                    logger.info(cmd)
+                cmd = cmd = [str(STANDALONE / "cat_standalone.sh")]
 
-                    subprocess.run(cmd, stdout=log, stderr=subprocess.STDOUT)
+                with log_file.open("w") as log:
+                    if segment_type in ["default", "simple"]:
+                        for file in bf:
+                            cmd.extend([file.path, "-b", batch])
+                            logger.info(cmd)
+                            subprocess.run(
+                                cmd, stdout=log, stderr=subprocess.STDOUT
+                            )
+
+                    elif segment_type in ["0", "1", "2", "3"]:
+                        files_to_process = [file.path for file in bf]
+                        cmd.extend(files_to_process)
+                        cmd.extend(["-b", batch, "-a1", segment_type])
+                        logger.info(cmd)
+                        subprocess.run(
+                            cmd, stdout=log, stderr=subprocess.STDOUT
+                        )
 
                 progress.update(subject_loop, advance=1)
 
@@ -152,7 +182,7 @@ def copy_files(layout_in, output_dir, subjects):
     """
     text = "copying subjects"
     with progress_bar(text=text) as progress:
-        subject_loop = progress.add_task(
+        copy_loop = progress.add_task(
             description="copying subjects", total=len(subjects)
         )
         for subject_label in subjects:
@@ -181,7 +211,7 @@ def copy_files(layout_in, output_dir, subjects):
                 img = nb.load(file.path)
                 nb.save(img, output_filename)
 
-            progress.update(subject_loop, advance=1)
+            progress.update(copy_loop, advance=1)
 
 
 if __name__ == "__main__":
