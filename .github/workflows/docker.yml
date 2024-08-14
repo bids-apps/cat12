@@ -1,0 +1,30 @@
+---
+name: docker build
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+
+    build:
+        runs-on: ubuntu-latest
+        steps:
+        -   uses: actions/checkout@v4
+            with:
+                fetch-depth: 0
+        -   name: get test data
+            run: make tests/data/MoAEpilot
+        -   name: Build the Docker image
+            run: |
+                docker build . --tag cat12
+                docker images
+        -   name: help
+            run: docker run --rm cat12 view cat_standalone_segment.m
+        -   name: test
+            run: docker run -v ${PWD}/tests/data/MoAEpilot:/data --rm cat12 /data/sub-01/anat/sub-01_T1w.nii -b cat_standalone_segment.m
