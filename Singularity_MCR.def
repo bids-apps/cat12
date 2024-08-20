@@ -161,7 +161,7 @@ USAGE:
    -a2 <STRING>| --arg2 <STRING> 2nd additional argument (otherwise use defaults or batch)
    -a <STRING> | --add  <STRING> add option to batch file
 
-   The first occurance of the parameter "<UNDEFINED>" in the batch file will be replaced by the
+   The first occurrence of the parameter "<UNDEFINED>" in the batch file will be replaced by the
    list of input files. You can use the existing batch files in this folder or create your own batch
    file with the SPM12 batch editor and leave the data field undefined. Please note that for creating
    your own batch file CAT12 has to be called in expert mode because the CAT12 standalone installation
