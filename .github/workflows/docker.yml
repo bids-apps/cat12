@@ -18,13 +18,22 @@ jobs:
         -   uses: actions/checkout@v4
             with:
                 fetch-depth: 0
+        -   name: Install dependencies
+            run: |
+                sudo apt-get -y -qq update
+                sudo apt-get -y install git-annex
+                pip install datalad
         -   name: get test data
-            run: make tests/data/MoAEpilot
+            run: make data_ds000001
         -   name: Build the Docker image
             run: |
-                docker build . --tag cat12
+                make build
                 docker images
         -   name: help
-            run: docker run --rm cat12 view cat_standalone_segment.m
-        -   name: test
-            run: docker run -v ${PWD}/tests/data/MoAEpilot:/data --rm cat12 /data/sub-01/anat/sub-01_T1w.nii -b cat_standalone_segment.m
+            run: docker run --rm cat12 --help
+        -   name: quick test
+            run: |
+                docker run --rm cat12 . . participant view tfce
+                docker run --rm cat12 . /foo participant copy tfce
+        -   name: segment
+            run: make ds000001
