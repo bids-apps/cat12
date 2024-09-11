@@ -39,7 +39,11 @@ def main():
 
     args = parser.parse_args(argv[1:])
 
-    log_level_name = log_levels()[int(args.verbose[0])]
+    verbose = args.verbose
+    if isinstance(verbose, list):
+        verbose = verbose[0]
+
+    log_level_name = log_levels()[int(verbose)]
     logger.setLevel(log_level_name)
 
     output_dir = Path(args.output_dir[0])
@@ -100,11 +104,15 @@ def main():
     if command == "segment":
 
         batch = "cat_standalone_segment.m"
-        segment_type = args.type[0]
+        segment_type = args.type
+        if isinstance(segment_type, list):
+            segment_type = segment_type[0]
         if segment_type == "simple":
             batch = "cat_standalone_simple.m"
         elif segment_type in ["0", "1", "2", "3"]:
             batch = "cat_standalone_segment_long.m"
+
+        logger.info(f"{segment_type=} - using batch {batch}.")
 
         text = "processing subjects"
         with progress_bar(text=text) as progress:
@@ -138,7 +146,6 @@ def main():
                             f"but subject {subject_label} only has 1 image."
                         )
                     )
-                    continue
 
                 now = datetime.now().replace(microsecond=0).isoformat()
                 log_file = (
@@ -149,7 +156,7 @@ def main():
                 )
                 log_file.parent.mkdir(parents=True, exist_ok=True)
 
-                cmd = cmd = [str(STANDALONE / "cat_standalone.sh")]
+                cmd = [str(STANDALONE / "cat_standalone.sh")]
 
                 with log_file.open("w") as log:
                     if segment_type in ["default", "simple"]:
