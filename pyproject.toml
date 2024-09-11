@@ -11,7 +11,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 
 [project.optional-dependencies]
-doc = [
+docs = [
     "myst-parser",
     "sphinx",
     "sphinx-argparse",
