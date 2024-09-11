@@ -2,5 +2,7 @@
 **/.git* annex.largefiles=nothing
 CHANGELOG.md annex.largefiles=nothing
 README.md annex.largefiles=nothing
+pyproject.toml annex.largefiles=nothing
+.readthedocs.yml annex.largefiles=nothing
 .github/**/*.yml annex.largefiles=nothing
 *.def annex.largefiles=nothing

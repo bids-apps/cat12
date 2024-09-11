@@ -1,8 +1,10 @@
 # ignoring this might speed up build
 # by preventing passing extra content to the docker daemon
 
-.github
-tests
+.simg
 
-*.simg
-*.def
+tests/data
+
+env
+
+docs/build

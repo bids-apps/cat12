@@ -1,3 +1,7 @@
 .simg
 
 tests/data
+
+env
+
+docs/build
