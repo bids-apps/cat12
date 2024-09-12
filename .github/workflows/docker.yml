@@ -10,30 +10,62 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
     cancel-in-progress: true
 
+env:
+    USER_NAME: bids
+    REPO_NAME: cat12
+    IMAGE: /home/runner/work/Remi-Gau/cat12-container/docker
+
 jobs:
 
-    build:
+    docker-build:
         runs-on: ubuntu-latest
         steps:
         -   uses: actions/checkout@v4
             with:
                 fetch-depth: 0
-        -   name: Install dependencies
-            run: |
-                sudo apt-get -y -qq update
-                sudo apt-get -y install git-annex
-                pip install datalad
-        -   name: get test data
-            run: make data_ds000001
         -   name: Build the Docker image
             run: |
                 make build
                 docker images
-        -   name: help
-            run: docker run --rm cat12 --help
-        -   name: quick test
+        -   name: Check image size and version
             run: |
-                docker run --rm cat12 . . participant view tfce
-                docker run --rm cat12 . /foo participant copy tfce
-        -   name: segment
-            run: make ds000001
+                docker images
+                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} --version
+        -   name: Run simple commands
+            run: |
+                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} --help
+                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} . . participant view tfce --verbose 3
+                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} . /foo participant copy tfce --verbose 3
+                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} . /foo segment --help
+        -   name: Save docker image
+            run: |
+                mkdir -p ${{ env.IMAGE }}
+                docker save "${{env.USER_NAME}}/${{env.REPO_NAME}}" > "${{ env.IMAGE }}/image.tar"
+        -   name: Upload docker artifacts
+            uses: actions/upload-artifact@v4
+            with:
+                name: docker
+                path: ${{ env.IMAGE }}
+
+    one-session:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                type: [default, simple, enigma]
+        needs: docker-build
+        steps:
+        -   uses: actions/checkout@v4
+            with:
+                fetch-depth: 0
+        -   name: Restore docker image
+            uses: actions/download-artifact@v4
+            with:
+                name: docker
+                path: ${{ env.IMAGE }}
+        -   name: Load image
+            run: docker load -i ${{ env.IMAGE }}/image.tar
+        -   name: Get data
+            run: make tests/data/MoAEpilot
+        -   name: Segment
+            run: docker run --rm \ -v ${PWD}/tests/data/MoAEpilot:/data \ ${{env.USER_NAME}}/${{env.REPO_NAME}} \ /data /data/derivatives participant segment
+                --verbose 3 \ --type ${{ matrix.type }}

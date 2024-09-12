@@ -2,4 +2,4 @@
 count = True
 show-source = True
 statistics = True
-max_function_length = 150
+max_function_length = 200

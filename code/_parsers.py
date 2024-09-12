@@ -17,7 +17,7 @@ def _base_parser(
         "--version",
         action="version",
         help="Show program's version number and exit.",
-        version=f"cat12 bids app version {__version__}",
+        version=__version__,
     )
     parser.add_argument(
         "bids_dir",
@@ -64,16 +64,7 @@ Multiple participants can be specified with a space separated list.
         nargs="+",
         required=False,
     )
-    parser.add_argument(
-        "--verbose",
-        help="""
-        Verbosity level.
-        """,
-        choices=[0, 1, 2, 3],
-        default=2,
-        type=int,
-        nargs=1,
-    )
+    parser = _add_versbose(parser)
     parser.add_argument(
         "--bids_filter_file",
         help="""
@@ -94,6 +85,20 @@ def _add_target(parser, with_all=False):
         help="Batch name",
         choices=supported_batches(),
         type=str,
+        nargs=1,
+    )
+    return parser
+
+
+def _add_versbose(parser):
+    parser.add_argument(
+        "--verbose",
+        help="""
+        Verbosity level.
+        """,
+        choices=[0, 1, 2, 3],
+        default=2,
+        type=int,
         nargs=1,
     )
     return parser
@@ -122,6 +127,7 @@ def common_parser(
         formatter_class=parser.formatter_class,
     )
     view_parser = _add_target(view_parser)
+    view_parser = _add_versbose(view_parser)
 
     copy_parser = subparsers.add_parser(
         "copy",
@@ -129,6 +135,7 @@ def common_parser(
         formatter_class=parser.formatter_class,
     )
     copy_parser = _add_target(copy_parser, with_all=True)
+    copy_parser = _add_versbose(copy_parser)
 
     segment_parser = subparsers.add_parser(
         "segment",
@@ -146,13 +153,22 @@ def common_parser(
         "--type",
         help="""Type of segmentation.
  default: default CAT12 preprocessing batch;
- default: simple processing batch;
- 0 - longitudinal developmental;
- 1 - longitudinal plasticity/learning;
- 2 - longitudinal aging;
- 3 - longitudinal save models 1 and 2;
+ simple: simple processing batch;
+ long_0 - longitudinal developmental;
+ long_1 - longitudinal plasticity/learning;
+ long_2 - longitudinal aging;
+ long_3 - longitudinal save models 1 and 2;
+ enigma - enigma segmentation
 """,
-        choices=["default", "simple", "0", "1", "2", "3"],
+        choices=[
+            "default",
+            "simple",
+            "long_0",
+            "long_1",
+            "long_2",
+            "long_3",
+            "enigma",
+        ],
         default="default",
         required=False,
         type=str,

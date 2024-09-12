@@ -109,8 +109,10 @@ def main():
             segment_type = segment_type[0]
         if segment_type == "simple":
             batch = "cat_standalone_simple.m"
-        elif segment_type in ["0", "1", "2", "3"]:
+        elif segment_type in ["long_0", "long_1", "long_2", "long_3"]:
             batch = "cat_standalone_segment_long.m"
+        elif segment_type == "enigma":
+            batch = "cat_standalone_segment_enigma.m"
 
         logger.info(f"{segment_type=} - using batch {batch}.")
 
@@ -139,7 +141,10 @@ def main():
                         f"No data found for subject {subject_label}."
                     )
                     continue
-                if segment_type in ["0", "1", "2", "3"] and len(bf) < 2:
+                if (
+                    segment_type in ["long_0", "long_1", "long_2", "long_3"]
+                    and len(bf) < 2
+                ):
                     logger.warning(
                         (
                             "Longitudinal segmentation requested "
@@ -167,10 +172,15 @@ def main():
                                 cmd, stdout=log, stderr=subprocess.STDOUT
                             )
 
-                    elif segment_type in ["0", "1", "2", "3"]:
+                    elif segment_type in [
+                        "long_0",
+                        "long_1",
+                        "long_2",
+                        "long_3",
+                    ]:
                         files_to_process = [file.path for file in bf]
                         cmd.extend(files_to_process)
-                        cmd.extend(["-b", batch, "-a1", segment_type])
+                        cmd.extend(["-b", batch, "-a1", segment_type[-1]])
                         logger.info(cmd)
                         subprocess.run(
                             cmd, stdout=log, stderr=subprocess.STDOUT

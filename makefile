@@ -8,14 +8,16 @@ build:
 	docker build . --tag cat12
 
 view:
-	docker run --rm -it cat12 . . participant view tfce
+	docker run --rm -it cat12 . . participant view tfce --verbose 3
 
 copy:
-	docker run --rm -it cat12 . /foo participant copy tfce
+	docker run --rm -it cat12 . /foo participant copy tfce --verbose 3
 
 segment: tests/data/MoAEpilot
-	docker run --rm -it -v $${PWD}/tests/data/MoAEpilot:/data cat12 /data /data/derivatives participant segment --verbose 3 --type 0
+	docker run --rm -it -v $${PWD}/tests/data/MoAEpilot:/data cat12 /data /data/derivatives participant segment --verbose 3 --type segment
 
+simple: tests/data/MoAEpilot
+	docker run --rm -it -v $${PWD}/tests/data/MoAEpilot:/data cat12 /data /data/derivatives participant segment --verbose 3 --type simple
 
 data_ds000001:
 	mkdir -p tests/data
