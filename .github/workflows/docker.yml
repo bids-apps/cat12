@@ -73,3 +73,9 @@ jobs:
                     ${{env.USER_NAME}}/${{env.REPO_NAME}} \
                         /data /data/derivatives participant \
                         segment --verbose 3 --type ${{ matrix.type }}
+
+        -   name: Upload output artifact
+            uses: actions/upload-artifact@v4
+            with:
+                name: output_${{ matrix.type }}
+                path: ${PWD}/tests/data/MoAEpilot/derivatives
