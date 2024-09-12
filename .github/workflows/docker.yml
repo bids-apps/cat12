@@ -79,12 +79,11 @@ jobs:
                         /data /data/derivatives participant \
                         segment --verbose 3 --type ${{ matrix.type }}
                 tree ${PWD}/tests/data/
-                tree /home/runner/work/Remi-Gau/cat12-container/tests/data/
         -   name: Upload output artifact
             uses: actions/upload-artifact@v4
             with:
                 name: output_${{ matrix.type }}
-                path: /home/runner/work/Remi-Gau/cat12-container/tests/data/MoAEpilot/derivatives
+                path: ${PWD}/tests/data//MoAEpilot/derivatives
 
     two-sessions:
         runs-on: ubuntu-latest
@@ -122,11 +121,11 @@ jobs:
                     ${{env.USER_NAME}}/${{env.REPO_NAME}} \
                         /data /data/derivatives participant \
                         segment --verbose 3 --type ${{ matrix.type }} \
+                        --participant_label 292 294 \
                         --skip_validation
                 tree ${PWD}/tests/data/
-                tree /home/runner/work/Remi-Gau/cat12-container/tests/data/
         -   name: Upload output artifact
             uses: actions/upload-artifact@v4
             with:
                 name: output_${{ matrix.type }}
-                path: /home/runner/work/Remi-Gau/cat12-container/tests/data/ds002799/derivatives
+                path: ${PWD}/tests/data/ds002799/derivatives

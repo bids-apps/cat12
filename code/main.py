@@ -167,7 +167,7 @@ def main():
                 cmd = [str(STANDALONE / "cat_standalone.sh")]
 
                 with log_file.open("w") as log:
-                    if segment_type in ["default", "simple"]:
+                    if segment_type in ["default", "simple", "enigma"]:
                         for file in bf:
                             cmd.extend([file.path, "-b", batch])
                             logger.info(cmd)
@@ -181,6 +181,7 @@ def main():
                         "long_2",
                         "long_3",
                     ]:
+                        # TODO do a mean for each time point first
                         files_to_process = [file.path for file in bf]
                         cmd.extend(files_to_process)
                         cmd.extend(["-b", batch, "-a1", segment_type[-1]])
