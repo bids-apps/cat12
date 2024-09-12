@@ -52,8 +52,13 @@ jobs:
         strategy:
             matrix:
                 type: [default, simple, enigma]
+            fail-fast: false
         needs: docker-build
         steps:
+        -   name: Install dependencies
+            run: |
+                sudo apt-get -y -qq update
+                sudo apt-get -y install tree
         -   uses: actions/checkout@v4
             with:
                 fetch-depth: 0
@@ -73,6 +78,8 @@ jobs:
                     ${{env.USER_NAME}}/${{env.REPO_NAME}} \
                         /data /data/derivatives participant \
                         segment --verbose 3 --type ${{ matrix.type }}
+                tree ${PWD}/tests/data/
+                tree /home/runner/work/Remi-Gau/cat12-container/tests/data/
         -   name: Upload output artifact
             uses: actions/upload-artifact@v4
             with:
@@ -84,6 +91,7 @@ jobs:
         strategy:
             matrix:
                 type: [long_0, long_2]
+            fail-fast: false
         needs: docker-build
         steps:
         -   name: Install python
@@ -93,7 +101,7 @@ jobs:
         -   name: Install dependencies
             run: |
                 sudo apt-get -y -qq update
-                sudo apt-get -y install git-annex
+                sudo apt-get -y install git-annex tree
                 pip install datalad
         -   uses: actions/checkout@v4
             with:
@@ -113,7 +121,10 @@ jobs:
                     -v ${PWD}/tests/data/ds002799:/data \
                     ${{env.USER_NAME}}/${{env.REPO_NAME}} \
                         /data /data/derivatives participant \
-                        segment --verbose 3 --type ${{ matrix.type }}
+                        segment --verbose 3 --type ${{ matrix.type }} \
+                        --skip_validation
+                tree ${PWD}/tests/data/
+                tree /home/runner/work/Remi-Gau/cat12-container/tests/data/
         -   name: Upload output artifact
             uses: actions/upload-artifact@v4
             with:
