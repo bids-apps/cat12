@@ -67,5 +67,9 @@ jobs:
         -   name: Get data
             run: make tests/data/MoAEpilot
         -   name: Segment
-            run: docker run --rm -v ${PWD}/tests/data/MoAEpilot:/data ${{env.USER_NAME}}/${{env.REPO_NAME}} /data /data/derivatives participant segment
-                --verbose 3 \ --type ${{ matrix.type }}
+            run: |
+                docker run --rm \
+                    -v ${PWD}/tests/data/MoAEpilot:/data \
+                    ${{env.USER_NAME}}/${{env.REPO_NAME}} \
+                        /data /data/derivatives participant \
+                        segment --verbose 3 --type ${{ matrix.type }}
