@@ -16,9 +16,10 @@ ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu:/opt/MCR-${MCR_V
     MATLABCMD="/opt/MCR-${MCR_VERSION}/v93/toolbox/matlab" \
     XAPPLRESDIR="/opt//opt/MCR-${MCR_VERSION}/v93/x11/app-defaults" \
     MCRROOT="/opt/MCR-${MCR_VERSION}/v93" \
-    CAT_VERSION=".8.1_r2042_R${MCR_VERSION}"
+    CAT_VERSION=".8.1_r2042_R${MCR_VERSION}" \
+    DENO_INSTALL="/root/.deno"
 ENV SPMROOT="/opt/CAT12${CAT_VERSION}" \
-    PATH="/opt/CAT12${CAT_VERSION}:$PATH" \
+    PATH="$DENO_INSTALL/bin:/opt/CAT12${CAT_VERSION}:$PATH" \
     STANDALONE="/opt/CAT12${CAT_VERSION}/standalone"
 
 RUN export ND_ENTRYPOINT="/neurodocker/startup.sh" \
@@ -63,6 +64,10 @@ RUN echo "Downloading standalone CAT12 ..." \
     && chmod -R 777 /opt/CAT12${CAT_VERSION} \
     # Test
     && /opt/CAT12${CAT_VERSION}/spm12 function exit
+
+## Install BIDS validator
+RUN curl -fsSL https://deno.land/install.sh | sh && \
+    deno install -Agf -n bids-validator jsr:@bids/validator@1.14.12
 
 # transfer code and set permission
 RUN mkdir -p /code

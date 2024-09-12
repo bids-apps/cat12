@@ -85,6 +85,9 @@ def main():
         )
         sys.exit(EXIT_CODES["DATAERR"]["Value"])
 
+    if not args.skip_validation:
+        run_validation(bids_dir)
+
     layout_in = get_dataset_layout(bids_dir)
 
     output_dir = output_dir / f"CAT12_{__version__}"
@@ -229,6 +232,14 @@ def copy_files(layout_in, output_dir, subjects):
                 nb.save(img, output_filename)
 
             progress.update(copy_loop, advance=1)
+
+
+def run_validation(bids_dir):
+    """Run bids validator."""
+    try:
+        subprocess.run(f"bids-validator {bids_dir}", shell=True, check=True)
+    except subprocess.CalledProcessError:
+        sys.exit(EXIT_CODES["DATAERR"]["Value"])
 
 
 if __name__ == "__main__":

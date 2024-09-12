@@ -34,9 +34,9 @@ jobs:
         -   name: Run simple commands
             run: |
                 docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} --help
-                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} . . participant view tfce --verbose 3
+                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} . /foo participant view tfce --verbose 3
                 docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} . /foo participant copy tfce --verbose 3
-                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} . /foo segment --help
+                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} . /foo participant segment --help
         -   name: Save docker image
             run: |
                 mkdir -p ${{ env.IMAGE }}

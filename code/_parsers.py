@@ -64,13 +64,19 @@ Multiple participants can be specified with a space separated list.
         nargs="+",
         required=False,
     )
-    parser = _add_versbose(parser)
+    parser = _add_verbose(parser)
     parser.add_argument(
         "--bids_filter_file",
         help="""
 A JSON file describing custom BIDS input filters using PyBIDS.
 For further details, please check out TBD.
         """,
+        required=False,
+    )
+    parser.add_argument(
+        "--skip_validation",
+        help="Do not run the bids validation.",
+        action="store_true",
         required=False,
     )
     return parser
@@ -90,7 +96,7 @@ def _add_target(parser, with_all=False):
     return parser
 
 
-def _add_versbose(parser):
+def _add_verbose(parser):
     parser.add_argument(
         "--verbose",
         help="""
@@ -127,7 +133,7 @@ def common_parser(
         formatter_class=parser.formatter_class,
     )
     view_parser = _add_target(view_parser)
-    view_parser = _add_versbose(view_parser)
+    view_parser = _add_verbose(view_parser)
 
     copy_parser = subparsers.add_parser(
         "copy",
@@ -135,7 +141,7 @@ def common_parser(
         formatter_class=parser.formatter_class,
     )
     copy_parser = _add_target(copy_parser, with_all=True)
-    copy_parser = _add_versbose(copy_parser)
+    copy_parser = _add_verbose(copy_parser)
 
     segment_parser = subparsers.add_parser(
         "segment",
