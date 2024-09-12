@@ -30,5 +30,5 @@ ds002799: data_ds002799
 		-v $${PWD}/tests/data:/data \
 		cat12 /data/ds002799 /data/outputs/ds002799 participant \
 			segment \
-			--type 2 \
+			--type long_2 \
 			--participant_label 292 294
