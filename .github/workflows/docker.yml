@@ -25,7 +25,7 @@ jobs:
                 fetch-depth: 0
         -   name: Build the Docker image
             run: |
-                make build
+                docker build . --tag ${{env.USER_NAME}}/${{env.REPO_NAME}}
                 docker images
         -   name: Check image size and version
             run: |
