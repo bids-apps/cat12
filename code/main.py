@@ -8,7 +8,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-import nibabel as nb
+import nibabel as nib
 from _parsers import common_parser
 from _version import __version__
 from bids_utils import (
@@ -160,8 +160,9 @@ def main():
                     output_dir
                     / f"sub-{subject_label}"
                     / "log"
-                    / f"{now}_sub-{subject_label}.log"
+                    / f"{now}_sub-{subject_label}.log".replace(":", "_")
                 )
+
                 log_file.parent.mkdir(parents=True, exist_ok=True)
 
                 cmd = [str(STANDALONE / "cat_standalone.sh")]
@@ -189,6 +190,10 @@ def main():
                         subprocess.run(
                             cmd, stdout=log, stderr=subprocess.STDOUT
                         )
+
+                gunzip_all_niftis(
+                    output_dir=output_dir, subject_label=subject_label
+                )
 
                 progress.update(subject_loop, advance=1)
 
@@ -229,8 +234,8 @@ def copy_files(layout_in, output_dir, subjects):
                 output_filename.parent.mkdir(exist_ok=True, parents=True)
 
                 logger.info(f"Copying {file.path} to {str(output_dir)}")
-                img = nb.load(file.path)
-                nb.save(img, output_filename)
+                img = nib.load(file.path)
+                nib.save(img, output_filename)
 
             progress.update(copy_loop, advance=1)
 
@@ -241,6 +246,16 @@ def run_validation(bids_dir):
         subprocess.run(f"bids-validator {bids_dir}", shell=True, check=True)
     except subprocess.CalledProcessError:
         sys.exit(EXIT_CODES["DATAERR"]["Value"])
+
+
+def gunzip_all_niftis(output_dir: Path, subject_label: str):
+    """Gunzip all niftis for a subject."""
+    logger.info(f"Gunzipping files for {subject_label}")
+    files = [x for x in (output_dir / f"sub-{subject_label}").glob("**/*.nii")]
+    for f in files:
+        nii = nib.load(f)
+        nii.to_filename(str(f) + ".gz")
+        f.unlink()
 
 
 if __name__ == "__main__":
