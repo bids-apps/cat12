@@ -226,8 +226,8 @@ def copy_files(layout_in, output_dir, subjects):
             )
             for file in bf:
                 output_filename = output_dir / file.relpath
-                if output_filename.suffix == ".gz":
-                    output_filename = output_filename.with_suffix("")
+                # if output_filename.suffix == ".gz":
+                #     output_filename = output_filename.with_suffix("")
                 if output_filename.exists():
                     continue
 
