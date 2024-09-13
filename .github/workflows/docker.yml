@@ -83,7 +83,7 @@ jobs:
             uses: actions/upload-artifact@v4
             with:
                 name: output_${{ matrix.type }}
-                path: ${PWD}/tests/data//MoAEpilot/derivatives
+                path: /home/runner/work/cat12-container/cat12-container/tests/data/MoAEpilot/derivatives
 
     two-sessions:
         runs-on: ubuntu-latest
@@ -128,4 +128,4 @@ jobs:
             uses: actions/upload-artifact@v4
             with:
                 name: output_${{ matrix.type }}
-                path: ${PWD}/tests/data/ds002799/derivatives
+                path: /home/runner/work/cat12-container/cat12-container/tests/data/ds002799/derivatives
