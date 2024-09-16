@@ -7,6 +7,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
+from subprocess import PIPE, STDOUT, Popen
 
 import nibabel as nib
 from _parsers import common_parser
@@ -171,10 +172,7 @@ def main():
                     if segment_type in ["default", "simple", "enigma"]:
                         for file in bf:
                             cmd.extend([file.path, "-b", batch])
-                            logger.info(cmd)
-                            subprocess.run(
-                                cmd, stdout=log, stderr=subprocess.STDOUT
-                            )
+                            run_command(cmd, log)
 
                     elif segment_type in [
                         "long_0",
@@ -186,10 +184,7 @@ def main():
                         files_to_process = [file.path for file in bf]
                         cmd.extend(files_to_process)
                         cmd.extend(["-b", batch, "-a1", segment_type[-1]])
-                        logger.info(cmd)
-                        subprocess.run(
-                            cmd, stdout=log, stderr=subprocess.STDOUT
-                        )
+                        run_command(cmd, log)
 
                 gunzip_all_niftis(
                     output_dir=output_dir, subject_label=subject_label
@@ -198,6 +193,15 @@ def main():
                 progress.update(subject_loop, advance=1)
 
     sys.exit(EXIT_CODES["SUCCESS"]["Value"])
+
+
+def run_command(cmd, log):
+    """Run command and log to STDOUT and log."""
+    logger.info(cmd)
+    with Popen(cmd, stdout=PIPE, stderr=STDOUT) as p:
+        for line in p.stdout:  # b'\n'-separated lines
+            sys.stdout.buffer.write(line)  # pass bytes as is
+            log.write(str(line))
 
 
 def copy_files(layout_in, output_dir, subjects):
@@ -226,8 +230,6 @@ def copy_files(layout_in, output_dir, subjects):
             )
             for file in bf:
                 output_filename = output_dir / file.relpath
-                # if output_filename.suffix == ".gz":
-                #     output_filename = output_filename.with_suffix("")
                 if output_filename.exists():
                     continue
 
