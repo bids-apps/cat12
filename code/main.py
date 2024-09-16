@@ -19,6 +19,7 @@ from bids_utils import (
 )
 from cat_logging import cat12_log
 from defaults import log_levels
+from methods import generate_method_section
 from rich import print
 from rich_argparse import RichHelpFormatter
 from utils import progress_bar
@@ -117,6 +118,8 @@ def main():
         batch = define_batch(segment_type=segment_type)
 
         logger.info(f"{segment_type=} - using batch {batch}.")
+
+        generate_method_section(output_dir=output_dir, batch=batch)
 
         text = "processing subjects"
         with progress_bar(text=text) as progress:

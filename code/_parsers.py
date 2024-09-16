@@ -3,7 +3,7 @@ from __future__ import annotations
 from argparse import ArgumentParser, HelpFormatter
 
 from _version import __version__
-from defaults import supported_batches
+from defaults import CAT_VERSION, MCR_VERSION, supported_batches
 
 
 def _base_parser(
@@ -17,7 +17,11 @@ def _base_parser(
         "--version",
         action="version",
         help="Show program's version number and exit.",
-        version=__version__,
+        version=f"""
+        BIDS app: {__version__};
+        CAT12: {CAT_VERSION};
+        MATLAB MCR: {MCR_VERSION}
+""",
     )
     parser.add_argument(
         "bids_dir",

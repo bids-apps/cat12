@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+import os
+
+MCR_VERSION = os.getenv("MCR_VERSION")
+CAT_VERSION = " ".join(os.getenv("CAT_VERSION")[1:10].split("_"))
+
 
 def log_levels() -> list[str]:
     """Return a list of log levels."""
@@ -16,9 +21,7 @@ def supported_batches() -> list[str]:
         "segment_long",
         "segment_enigma",
         "resample",
-        "tfce",
         "get_IQR",
-        "smooth",
         "get_TIV",
         "get_quality",
         "get_ROI_values",
@@ -31,13 +34,13 @@ def supported_batches() -> list[str]:
 # cat_standalone_segment_long.m
 
 # cat_standalone_resample.m
-# cat_standalone_tfce.m
 # cat_standalone_get_IQR.m
-# cat_standalone_smooth.m
 # cat_standalone_get_TIV.m
 # cat_standalone_get_quality.m
 # cat_standalone_get_ROI_values.m
 
 # WON'T DO
+# cat_standalone_smooth.m
+# cat_standalone_tfce.m
 # cat_standalone_dicom2nii.m
 # cat_standalone_deface.m

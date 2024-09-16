@@ -7,6 +7,9 @@ tests/data/MoAEpilot:
 build:
 	docker build . --tag cat12
 
+version:
+	docker run --rm -it cat12 . . participant --version
+
 view:
 	docker run --rm -it cat12 . . participant view tfce --verbose 3
 
