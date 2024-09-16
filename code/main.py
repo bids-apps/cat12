@@ -107,16 +107,11 @@ def main():
 
     if command == "segment":
 
-        batch = "cat_standalone_segment.m"
         segment_type = args.type
         if isinstance(segment_type, list):
             segment_type = segment_type[0]
-        if segment_type == "simple":
-            batch = "cat_standalone_simple.m"
-        elif segment_type in ["long_0", "long_1", "long_2", "long_3"]:
-            batch = "cat_standalone_segment_long.m"
-        elif segment_type == "enigma":
-            batch = "cat_standalone_segment_enigma.m"
+
+        batch = define_batch(segment_type=segment_type)
 
         logger.info(f"{segment_type=} - using batch {batch}.")
 
@@ -145,10 +140,7 @@ def main():
                         f"No data found for subject {subject_label}."
                     )
                     continue
-                if (
-                    segment_type in ["long_0", "long_1", "long_2", "long_3"]
-                    and len(bf) < 2
-                ):
+                if is_longitudinal_segmentation(segment_type) and len(bf) < 2:
                     logger.warning(
                         (
                             "Longitudinal segmentation requested "
@@ -156,15 +148,7 @@ def main():
                         )
                     )
 
-                now = datetime.now().replace(microsecond=0).isoformat()
-                log_file = (
-                    output_dir
-                    / f"sub-{subject_label}"
-                    / "log"
-                    / f"{now}_sub-{subject_label}.log".replace(":", "_")
-                )
-
-                log_file.parent.mkdir(parents=True, exist_ok=True)
+                log_file = log_filename(output_dir, subject_label)
 
                 cmd = [str(STANDALONE / "cat_standalone.sh")]
 
@@ -174,12 +158,7 @@ def main():
                             cmd.extend([file.path, "-b", batch])
                             run_command(cmd, log)
 
-                    elif segment_type in [
-                        "long_0",
-                        "long_1",
-                        "long_2",
-                        "long_3",
-                    ]:
+                    elif is_longitudinal_segmentation(segment_type):
                         # TODO do a mean for each time point first
                         files_to_process = [file.path for file in bf]
                         cmd.extend(files_to_process)
@@ -193,6 +172,41 @@ def main():
                 progress.update(subject_loop, advance=1)
 
     sys.exit(EXIT_CODES["SUCCESS"]["Value"])
+
+
+def define_batch(segment_type):
+    """Find batch to run."""
+    batch = "cat_standalone_segment.m"
+    if segment_type == "simple":
+        batch = "cat_standalone_simple.m"
+    elif is_longitudinal_segmentation(segment_type):
+        batch = "cat_standalone_segment_long.m"
+    elif segment_type == "enigma":
+        batch = "cat_standalone_segment_enigma.m"
+    return batch
+
+
+def log_filename(output_dir, subject_label):
+    """Generate filename for logfile."""
+    now = datetime.now().replace(microsecond=0).isoformat()
+    log_file = (
+        output_dir
+        / f"sub-{subject_label}"
+        / "log"
+        / f"{now}_sub-{subject_label}.log".replace(":", "_")
+    )
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+    return log_file
+
+
+def is_longitudinal_segmentation(segment_type):
+    """Check if the segmentation requested is longitudinal."""
+    return segment_type in [
+        "long_0",
+        "long_1",
+        "long_2",
+        "long_3",
+    ]
 
 
 def run_command(cmd, log):
