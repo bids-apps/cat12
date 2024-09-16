@@ -23,6 +23,9 @@ from rich import print
 from rich_argparse import RichHelpFormatter
 from utils import progress_bar
 
+env = os.environ
+env["PYTHONUNBUFFERED"] = "True"
+
 argv = sys.argv
 
 with open(Path(__file__).parent / "exit_codes.json") as f:
@@ -212,9 +215,18 @@ def is_longitudinal_segmentation(segment_type):
 def run_command(cmd, log):
     """Run command and log to STDOUT and log."""
     logger.info(cmd)
-    with Popen(cmd, stdout=PIPE, stderr=STDOUT) as p:
-        for line in p.stdout:  # b'\n'-separated lines
-            sys.stdout.buffer.write(line)  # pass bytes as is
+    with Popen(
+        cmd,
+        stdout=PIPE,
+        stderr=STDOUT,
+        bufsize=1,
+        text=True,
+        encoding="utf-8",
+        env=env,
+    ) as proc:
+        while (_ := proc.poll()) is None:
+            line = proc.stdout.readline()
+            sys.stdout.write(str(line))
             log.write(str(line))
 
 
