@@ -10,30 +10,34 @@ from pathlib import Path
 from subprocess import PIPE, STDOUT, Popen
 
 import nibabel as nib
-from _parsers import common_parser
-from _version import __version__
-from bids_utils import (
+from rich import print
+from rich_argparse import RichHelpFormatter
+
+from cat12._parsers import common_parser
+from cat12._version import __version__
+from cat12.bids_utils import (
     get_dataset_layout,
     init_derivatives_layout,
     list_subjects,
 )
-from cat_logging import cat12_log
-from defaults import log_levels
-from methods import generate_method_section
-from rich import print
-from rich_argparse import RichHelpFormatter
-from utils import progress_bar
+from cat12.cat_logging import cat12_log
+from cat12.defaults import CAT_VERSION, log_levels
+from cat12.methods import generate_method_section
+from cat12.utils import progress_bar
 
 env = os.environ
 env["PYTHONUNBUFFERED"] = "True"
 
 argv = sys.argv
 
-with open(Path(__file__).parent / "exit_codes.json") as f:
+with Path.open(Path(__file__).parent / "exit_codes.json") as f:
     EXIT_CODES = json.load(f)
 
 # Get environment variable
-STANDALONE = Path(os.getenv("STANDALONE"))
+STANDALONE = os.getenv("STANDALONE")
+if STANDALONE is None:
+    STANDALONE = f"/opt/CAT12${CAT_VERSION}/standalone"
+STANDALONE = Path(STANDALONE)
 
 logger = cat12_log(name="cat12")
 
@@ -55,24 +59,24 @@ def main():
 
     command = args.command
 
-    if command == "help":
-        subprocess.run([STANDALONE / "cat_standalone.sh"])
-        sys.exit(EXIT_CODES["SUCCESS"]["Value"])
-
-    elif command == "copy":
+    if command == "copy":
         target = args.target[0]
 
         output_dir.mkdir(exist_ok=True, parents=True)
 
-        if target == "all":
-            files = STANDALONE.glob("*.m")
-        else:
-            files = [STANDALONE / f"cat_standalone_{target}.m"]
-
+        files = (
+            STANDALONE.glob("*.m")
+            if target == "all"
+            else [STANDALONE / f"cat_standalone_{target}.m"]
+        )
         for source_file in files:
-            logger.info(f"Copying {source_file} to {str(output_dir)}")
+            logger.info(f"Copying {source_file} to {output_dir!s}")
             shutil.copy(source_file, output_dir)
 
+        sys.exit(EXIT_CODES["SUCCESS"]["Value"])
+
+    elif command == "help":
+        subprocess.run([STANDALONE / "cat_standalone.sh"])
         sys.exit(EXIT_CODES["SUCCESS"]["Value"])
 
     elif command == "view":
@@ -104,7 +108,6 @@ def main():
         sys.exit(EXIT_CODES["FAILURE"]["Value"])
 
     if command == "segment":
-
         segment_type = args.type
         if isinstance(segment_type, list):
             segment_type = segment_type[0]
@@ -115,8 +118,7 @@ def main():
             copy_files(layout_in, output_dir, subjects)
             layout_out = init_derivatives_layout(output_dir)
         else:
-            OUTPUT_DIR = os.path.relpath(output_dir, bids_dir)
-            os.environ["OUTPUT_DIR"] = OUTPUT_DIR
+            os.environ["OUTPUT_DIR"] = os.path.relpath(output_dir, bids_dir)
             layout_out = layout_in
 
         batch = define_batch(segment_type=segment_type)
@@ -136,13 +138,11 @@ def main():
 
         text = "processing subjects"
         with progress_bar(text=text) as progress:
-
             subject_loop = progress.add_task(
                 description="processing subjects", total=len(subjects)
             )
 
             for subject_label in subjects:
-
                 this_filter = {
                     "datatype": "anat",
                     "suffix": "T1w",
@@ -185,15 +185,13 @@ def main():
 
 def check_input(subject_label: str, bf: list, segment_type: str):
     """Check number of input files."""
-    if len(bf) < 1:
+    if not bf:
         logger.warning(f"No data found for subject {subject_label}.")
         return False
     if is_longitudinal_segmentation(segment_type) and len(bf) < 2:
         logger.warning(
-            (
-                "Longitudinal segmentation requested "
-                f"but subject {subject_label} only has 1 image."
-            )
+            "Longitudinal segmentation requested "
+            f"but subject {subject_label} only has 1 image."
         )
     return True
 
@@ -282,7 +280,7 @@ def copy_files(layout_in, output_dir, subjects):
 
                 output_filename.parent.mkdir(exist_ok=True, parents=True)
 
-                logger.info(f"Copying {file.path} to {str(output_dir)}")
+                logger.info(f"Copying {file.path} to {output_dir!s}")
                 img = nib.load(file.path)
                 nib.save(img, output_filename)
 
@@ -300,10 +298,10 @@ def run_validation(bids_dir):
 def gunzip_all_niftis(output_dir: Path, subject_label: str):
     """Gunzip all niftis for a subject."""
     logger.info(f"Gunzipping files for {subject_label}")
-    files = [x for x in (output_dir / f"sub-{subject_label}").glob("**/*.nii")]
+    files = list((output_dir / f"sub-{subject_label}").glob("**/*.nii"))
     for f in files:
         nii = nib.load(f)
-        nii.to_filename(str(f) + ".gz")
+        nii.to_filename(f"{f!s}.gz")
         f.unlink()
 
 

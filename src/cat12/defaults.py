@@ -5,7 +5,13 @@ from __future__ import annotations
 import os
 
 MCR_VERSION = os.getenv("MCR_VERSION")
-CAT_VERSION = " ".join(os.getenv("CAT_VERSION")[1:10].split("_"))
+if MCR_VERSION is None:
+    MCR_VERSION = "2017b"
+
+tmp = os.getenv("CAT_VERSION")
+if tmp is None:
+    tmp = f".8.1_r2042_R${MCR_VERSION}"
+CAT_VERSION = " ".join(tmp[1:10].split("_"))
 
 
 def log_levels() -> list[str]:
