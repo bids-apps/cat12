@@ -22,8 +22,7 @@ ENV SPMROOT="/opt/CAT12${CAT_VERSION}" \
     PATH="$DENO_INSTALL/bin:/opt/CAT12${CAT_VERSION}:$PATH" \
     STANDALONE="/opt/CAT12${CAT_VERSION}/standalone"
 
-RUN export ND_ENTRYPOINT="/neurodocker/startup.sh" \
-    && apt-get update -qq \
+RUN apt-get update -qq \
     && apt-get install -y -q --no-install-recommends \
            apt-utils \
            bc \
@@ -31,6 +30,7 @@ RUN export ND_ENTRYPOINT="/neurodocker/startup.sh" \
            ca-certificates \
            curl \
            dbus-x11 \
+           git \
            libncurses5 \
            libxext6 \
            libxmu6 \
@@ -73,8 +73,8 @@ RUN curl -fsSL https://deno.land/install.sh | sh && \
 RUN mkdir -p /code
 COPY . /code
 RUN cd code && \
-    git restore . \
-    pip install -r /code/requirements.txt && \
+    git restore . && \
+    pip install -r requirements.txt && \
     pip install .
 
 RUN ls /code && find /code -type f -print0 | xargs -0 chmod +r
