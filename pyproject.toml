@@ -3,7 +3,12 @@ build-backend = "hatchling.build"
 requires = ["hatchling", "hatch-vcs"]
 
 [project]
-dependencies = ["rich_argparse", "pybids", "nibabel"]
+dependencies = [
+    "rich_argparse",
+    "pybids",
+    "nibabel",
+    "jinja2"
+]
 dynamic = ["version"]
 license = {text = "MIT"}
 name = "cat12"
@@ -19,6 +24,9 @@ docs = [
     "pydata-sphinx-theme",
     "sphinx-togglebutton"
 ]
+
+[project.scripts]
+cat12 = "cat12.main:main"
 
 [tool.codespell]
 builtin = "clear,rare"

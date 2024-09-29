@@ -71,10 +71,12 @@ RUN curl -fsSL https://deno.land/install.sh | sh && \
 
 # transfer code and set permission
 RUN mkdir -p /code
-COPY ./code/requirements.txt /code
-RUN pip install -r /code/requirements.txt
+COPY . /code
+RUN cd code && \
+    git restore . \
+    pip install -r /code/requirements.txt && \
+    pip install .
 
-COPY ./code /code
 RUN ls /code && find /code -type f -print0 | xargs -0 chmod +r
 
 # modify enigma script to output content to path defined by an env variable
@@ -82,4 +84,4 @@ RUN sed -i -e "s/cat_version/getenv('OUTPUT_DIR')/g" /opt/CAT12${CAT_VERSION}/st
 
 WORKDIR ${STANDALONE}
 
-ENTRYPOINT ["python3", "/code/main.py"]
+ENTRYPOINT ["cat12"]
