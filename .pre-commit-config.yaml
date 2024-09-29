@@ -22,21 +22,19 @@ repos:
     hooks:
     -   id: codespell
 
--   repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+# Format TOML files
+-   repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+    rev: v2.14.0
     hooks:
-    -   id: isort
-        args: [--line-length, '79', --profile, black]
+    -   id: pretty-format-toml
+        args: [--autofix, --indent, '4']
 
--   repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 24.8.0
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.6.8
     hooks:
-    -   id: black
-        args: [--line-length, '79']
-
--   repo: https://github.com/pycqa/flake8
-    rev: 7.1.1
-    hooks:
-    -   id: flake8
-        args: [--config, .flake8, --verbose]
-        additional_dependencies: [flake8-docstrings, flake8-use-fstring, flake8-functions, flake8-bugbear]
+    # Run the linter.
+    -   id: ruff
+        args: [--fix]
+    # Run the formatter.
+    -   id: ruff-format

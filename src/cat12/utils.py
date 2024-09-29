@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cat_logging import cat12_log
 from rich.progress import (
     BarColumn,
     MofNCompleteColumn,
@@ -15,6 +14,8 @@ from rich.progress import (
     TimeElapsedColumn,
     TimeRemainingColumn,
 )
+
+from cat12.cat_logging import cat12_log
 
 logger = cat12_log(name="cat12")
 

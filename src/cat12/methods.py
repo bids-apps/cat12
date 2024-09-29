@@ -2,9 +2,10 @@
 
 from pathlib import Path
 
-from _version import __version__
-from defaults import CAT_VERSION, MCR_VERSION
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+
+from cat12._version import __version__
+from cat12.defaults import CAT_VERSION, MCR_VERSION
 
 
 def generate_method_section(
@@ -12,7 +13,7 @@ def generate_method_section(
     version: str = __version__,
     cat_version: str = CAT_VERSION,
     mcr_version: str = MCR_VERSION,
-    batch: str = None,
+    batch: str | None = None,
 ) -> None:
     """Add a method section to the output dataset."""
     env = Environment(
@@ -34,5 +35,5 @@ def generate_method_section(
         "batch": batch,
     }
 
-    with open(output_file, "w") as f:
+    with Path.open(output_file, "w") as f:
         print(template.render(data=data), file=f)

@@ -6,10 +6,11 @@ import json
 from pathlib import Path
 from typing import Any
 
-from _version import __version__
 from bids import BIDSLayout  # type: ignore
-from cat_logging import cat12_log
-from utils import create_dir_if_absent
+
+from cat12._version import __version__
+from cat12.cat_logging import cat12_log
+from cat12.utils import create_dir_if_absent
 
 logger = cat12_log(name="cat12")
 
@@ -125,5 +126,5 @@ def write_dataset_description(output_dir) -> None:
 
     output_file = output_dir / "dataset_description.json"
 
-    with open(output_file, "w") as ff:
+    with Path.open(output_file, "w") as ff:
         json.dump(data, ff, indent=4)
