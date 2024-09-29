@@ -1,0 +1,36 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[project]
+version = "0.1.0"
+dependencies = ["rich_argparse", "pybids", "nibabel"]
+license = { text = "MIT" }
+name = "cat12"
+readme = "README.md"
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+docs = [
+    "myst-parser",
+    "sphinx",
+    "sphinx-argparse",
+    "sphinx-copybutton",
+    "pydata-sphinx-theme",
+    "sphinx-togglebutton",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["code"]
+
+[tool.black]
+line-length = 79
+
+[tool.codespell]
+builtin = "clear,rare"
+
+[tool.isort]
+combine_as_imports = true
+line_length = 79
+profile = "black"
+skip_gitignore = true

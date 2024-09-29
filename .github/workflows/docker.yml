@@ -1,0 +1,139 @@
+---
+name: docker build
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    USER_NAME: bids
+    REPO_NAME: cat12
+    IMAGE: /home/runner/work/Remi-Gau/cat12-container/docker
+
+jobs:
+
+    docker-build:
+        runs-on: ubuntu-latest
+        steps:
+        -   uses: actions/checkout@v4
+            with:
+                fetch-depth: 0
+        # # cache tarred docker image to speed up build on follow up runs
+        # -   uses: actions/cache@v4
+        #     id: cache
+        #     with:
+        #         path: ${{ env.IMAGE }}/image.tar
+        #         key: data
+        # -   if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        #     name: Load image
+        #     run: docker load -i ${{ env.IMAGE }}/image.tar
+        -   name: Build the Docker image
+            run: |
+                docker build . --tag ${{env.USER_NAME}}/${{env.REPO_NAME}}
+        -   name: Check image size and version
+            run: |
+                docker images
+                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} --version
+        -   name: Run simple commands
+            run: |
+                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} --help
+                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} . /foo participant view segment --verbose 3
+                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} . /foo participant copy segment --verbose 3
+                docker run --rm ${{env.USER_NAME}}/${{env.REPO_NAME}} . /foo participant segment --help
+        -   name: Save docker image
+            run: |
+                mkdir -p ${{ env.IMAGE }}
+                docker save "${{env.USER_NAME}}/${{env.REPO_NAME}}" > "${{ env.IMAGE }}/image.tar"
+        -   name: Upload docker artifacts
+            uses: actions/upload-artifact@v4
+            with:
+                name: docker
+                path: ${{ env.IMAGE }}
+
+    one-session:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                type: [default, simple, enigma]
+            fail-fast: false
+        needs: docker-build
+        steps:
+        -   name: Install dependencies
+            run: |
+                sudo apt-get -y -qq update
+                sudo apt-get -y install tree
+        -   uses: actions/checkout@v4
+            with:
+                fetch-depth: 0
+        -   name: Restore docker image
+            uses: actions/download-artifact@v4
+            with:
+                name: docker
+                path: ${{ env.IMAGE }}
+        -   name: Load image
+            run: docker load -i ${{ env.IMAGE }}/image.tar
+        -   name: Get data
+            run: make tests/data/MoAEpilot
+        -   name: Segment
+            run: |
+                docker run --rm \
+                    -v ${PWD}/tests/data/MoAEpilot:/data \
+                    ${{env.USER_NAME}}/${{env.REPO_NAME}} \
+                        /data /data/derivatives participant \
+                        segment --verbose 3 --type ${{ matrix.type }}
+                tree ${PWD}/tests/data/
+        -   name: Upload output artifact
+            uses: actions/upload-artifact@v4
+            with:
+                name: output_${{ matrix.type }}
+                path: /home/runner/work/cat12-container/cat12-container/tests/data/MoAEpilot/derivatives
+
+    two-sessions:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                type: [long_0, long_2]
+            fail-fast: false
+        needs: docker-build
+        steps:
+        -   name: Install python
+            uses: actions/setup-python@v5
+            with:
+                python-version: '3.11'
+        -   name: Install dependencies
+            run: |
+                sudo apt-get -y -qq update
+                sudo apt-get -y install git-annex tree
+                pip install datalad
+        -   uses: actions/checkout@v4
+            with:
+                fetch-depth: 0
+        -   name: Restore docker image
+            uses: actions/download-artifact@v4
+            with:
+                name: docker
+                path: ${{ env.IMAGE }}
+        -   name: Load image
+            run: docker load -i ${{ env.IMAGE }}/image.tar
+        -   name: Get data
+            run: make data_ds002799
+        -   name: Segment
+            run: |
+                docker run --rm \
+                    -v ${PWD}/tests/data/ds002799:/data \
+                    ${{env.USER_NAME}}/${{env.REPO_NAME}} \
+                        /data /data/derivatives participant \
+                        segment --verbose 3 --type ${{ matrix.type }} \
+                        --participant_label 292 294 \
+                        --skip_validation
+                tree ${PWD}/tests/data/
+        -   name: Upload output artifact
+            uses: actions/upload-artifact@v4
+            with:
+                name: output_${{ matrix.type }}
+                path: /home/runner/work/cat12-container/cat12-container/tests/data/ds002799/derivatives
