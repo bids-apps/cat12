@@ -21,7 +21,7 @@ from cat12.bids_utils import (
     list_subjects,
 )
 from cat12.cat_logging import cat12_log
-from cat12.defaults import log_levels
+from cat12.defaults import CAT_VERSION, log_levels
 from cat12.methods import generate_method_section
 from cat12.utils import progress_bar
 
@@ -34,7 +34,10 @@ with Path.open(Path(__file__).parent / "exit_codes.json") as f:
     EXIT_CODES = json.load(f)
 
 # Get environment variable
-STANDALONE = Path(os.getenv("STANDALONE"))
+STANDALONE = os.getenv("STANDALONE")
+if STANDALONE is None:
+    STANDALONE = f"/opt/CAT12${CAT_VERSION}/standalone"
+STANDALONE = Path(STANDALONE)
 
 logger = cat12_log(name="cat12")
 
