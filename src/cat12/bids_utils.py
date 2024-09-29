@@ -106,24 +106,23 @@ def write_dataset_description(output_dir) -> None:
         "DatasetType": "derivative",
         "License": "???",
         "ReferencesAndLinks": ["https://doi.org/10.1101/2022.06.11.495736"],
+        "GeneratedBy": [
+            {
+                "Name": "cat12",
+                "Version": __version__,
+                "Container": {"Type": "", "Tag": __version__},
+                "Description": "",
+                "CodeURL": "",
+            }
+        ],
+        "SourceDatasets": [
+            {
+                "DOI": "doi:",
+                "URL": "",
+                "Version": "",
+            }
+        ],
     }
-    data["GeneratedBy"] = [
-        {
-            "Name": "cat12",
-            "Version": __version__,
-            "Container": {"Type": "", "Tag": __version__},
-            "Description": "",
-            "CodeURL": "",
-        },
-    ]
-    data["SourceDatasets"] = [
-        {
-            "DOI": "doi:",
-            "URL": "",
-            "Version": "",
-        }
-    ]
-
     output_file = output_dir / "dataset_description.json"
 
     with Path.open(output_file, "w") as ff:

@@ -59,24 +59,24 @@ def main():
 
     command = args.command
 
-    if command == "help":
-        subprocess.run([STANDALONE / "cat_standalone.sh"])
-        sys.exit(EXIT_CODES["SUCCESS"]["Value"])
-
-    elif command == "copy":
+    if command == "copy":
         target = args.target[0]
 
         output_dir.mkdir(exist_ok=True, parents=True)
 
-        if target == "all":
-            files = STANDALONE.glob("*.m")
-        else:
-            files = [STANDALONE / f"cat_standalone_{target}.m"]
-
+        files = (
+            STANDALONE.glob("*.m")
+            if target == "all"
+            else [STANDALONE / f"cat_standalone_{target}.m"]
+        )
         for source_file in files:
             logger.info(f"Copying {source_file} to {output_dir!s}")
             shutil.copy(source_file, output_dir)
 
+        sys.exit(EXIT_CODES["SUCCESS"]["Value"])
+
+    elif command == "help":
+        subprocess.run([STANDALONE / "cat_standalone.sh"])
         sys.exit(EXIT_CODES["SUCCESS"]["Value"])
 
     elif command == "view":
@@ -185,7 +185,7 @@ def main():
 
 def check_input(subject_label: str, bf: list, segment_type: str):
     """Check number of input files."""
-    if len(bf) < 1:
+    if not bf:
         logger.warning(f"No data found for subject {subject_label}.")
         return False
     if is_longitudinal_segmentation(segment_type) and len(bf) < 2:
@@ -298,10 +298,10 @@ def run_validation(bids_dir):
 def gunzip_all_niftis(output_dir: Path, subject_label: str):
     """Gunzip all niftis for a subject."""
     logger.info(f"Gunzipping files for {subject_label}")
-    files = [x for x in (output_dir / f"sub-{subject_label}").glob("**/*.nii")]
+    files = list((output_dir / f"sub-{subject_label}").glob("**/*.nii"))
     for f in files:
         nii = nib.load(f)
-        nii.to_filename(str(f) + ".gz")
+        nii.to_filename(f"{f!s}.gz")
         f.unlink()
 
 
