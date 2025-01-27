@@ -128,7 +128,7 @@ def main():
         (output_dir / "logs").mkdir(exist_ok=True, parents=True)
         shutil.copy2(
             src=Path("/opt")
-            / f'CAT12{os.environ["CAT_VERSION"]}'
+            / f"CAT12{os.environ['CAT_VERSION']}"
             / "standalone"
             / batch,
             dst=output_dir / "logs",
