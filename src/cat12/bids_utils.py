@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import Any
 
 from bids import BIDSLayout  # type: ignore
-
 from cat12._version import __version__
+
 from cat12.cat_logging import cat12_log
 from cat12.utils import create_dir_if_absent
 

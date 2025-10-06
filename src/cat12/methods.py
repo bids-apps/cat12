@@ -2,9 +2,9 @@
 
 from pathlib import Path
 
+from cat12._version import __version__
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cat12._version import __version__
 from cat12.defaults import CAT_VERSION, MCR_VERSION
 
 
