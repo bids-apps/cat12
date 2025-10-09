@@ -3,6 +3,7 @@ from __future__ import annotations
 from argparse import ArgumentParser, HelpFormatter
 
 from cat12._version import __version__
+
 from cat12.defaults import CAT_VERSION, MCR_VERSION, supported_batches
 
 

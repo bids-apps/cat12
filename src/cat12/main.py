@@ -10,11 +10,11 @@ from pathlib import Path
 from subprocess import PIPE, STDOUT, Popen
 
 import nibabel as nib
+from cat12._version import __version__
 from rich import print
 from rich_argparse import RichHelpFormatter
 
 from cat12._parsers import common_parser
-from cat12._version import __version__
 from cat12.bids_utils import (
     get_dataset_layout,
     init_derivatives_layout,
