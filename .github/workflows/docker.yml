@@ -20,7 +20,7 @@ jobs:
     docker-build:
         runs-on: ubuntu-latest
         steps:
-        -   uses: actions/checkout@v5
+        -   uses: actions/checkout@v6
             with:
                 fetch-depth: 0
         -   name: Build the Docker image
@@ -58,7 +58,7 @@ jobs:
             run: |
                 sudo apt-get -y -qq update
                 sudo apt-get -y install tree
-        -   uses: actions/checkout@v5
+        -   uses: actions/checkout@v6
             with:
                 fetch-depth: 0
         -   name: Restore docker image
@@ -101,7 +101,7 @@ jobs:
                 sudo apt-get -y -qq update
                 sudo apt-get -y install git-annex tree
                 pip install datalad
-        -   uses: actions/checkout@v5
+        -   uses: actions/checkout@v6
             with:
                 fetch-depth: 0
         -   name: Restore docker image
@@ -137,7 +137,7 @@ jobs:
                 shell: bash -el {0}
         if: ${{ github.ref == 'refs/heads/main' || github.ref_type == 'tag' }}
         steps:
-        -   uses: actions/checkout@v5
+        -   uses: actions/checkout@v6
             with:
                 fetch-depth: 0
         -   name: Restore docker image
