@@ -41,7 +41,7 @@ jobs:
                 mkdir -p ${{ env.IMAGE }}
                 docker save "${{env.USER_NAME}}/${{env.REPO_NAME}}" > "${{ env.IMAGE }}/image.tar"
         -   name: Upload docker artifacts
-            uses: actions/upload-artifact@v6
+            uses: actions/upload-artifact@v7
             with:
                 name: docker
                 path: ${{ env.IMAGE }}
@@ -79,7 +79,7 @@ jobs:
                         segment --verbose 3 --type ${{ matrix.type }}
                 tree ${PWD}/tests/data/
         -   name: Upload output artifact
-            uses: actions/upload-artifact@v6
+            uses: actions/upload-artifact@v7
             with:
                 name: output_${{ matrix.type }}
                 path: /home/runner/work/cat12-container/cat12-container/tests/data/MoAEpilot/derivatives
@@ -124,7 +124,7 @@ jobs:
                         --skip_validation
                 tree ${PWD}/tests/data/
         -   name: Upload output artifact
-            uses: actions/upload-artifact@v6
+            uses: actions/upload-artifact@v7
             with:
                 name: output_${{ matrix.type }}
                 path: /home/runner/work/cat12-container/cat12-container/tests/data/ds002799/derivatives
